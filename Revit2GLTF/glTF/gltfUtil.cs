@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Revit2Gltf.glTF
 {
-    public class gltfUtil
+    public class glTFUtil
     {
         public static void addVec3BufferViewAndAccessor(GLTF gltf, glTFBinaryData bufferData)
         {
@@ -18,11 +18,11 @@ namespace Revit2Gltf.glTF
                 byteOffset = gltf.bufferViews[gltf.bufferViews.Count - 1].byteLength + gltf.bufferViews[gltf.bufferViews.Count - 1].byteOffset;
             }
             var bufferIndex = 0;
-            var vec3View = gltfUtil.addBufferView(bufferIndex, byteOffset, 4 * v3ds.Count);
+            var vec3View = glTFUtil.addBufferView(bufferIndex, byteOffset, 4 * v3ds.Count);
             vec3View.target = Targets.ARRAY_BUFFER;
             gltf.bufferViews.Add(vec3View);
-            var vecAccessor = gltfUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.FLOAT, v3ds.Count / 3, AccessorType.VEC3);
-            var minAndMax = gltfUtil.GetVec3MinMax(v3ds);
+            var vecAccessor = glTFUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.FLOAT, v3ds.Count / 3, AccessorType.VEC3);
+            var minAndMax = glTFUtil.GetVec3MinMax(v3ds);
             vecAccessor.min = new List<double>() { minAndMax[0], minAndMax[1], minAndMax[2] };
             vecAccessor.max = new List<double>() { minAndMax[3], minAndMax[4], minAndMax[5] };
             gltf.accessors.Add(vecAccessor);
@@ -37,10 +37,10 @@ namespace Revit2Gltf.glTF
                 byteOffset = gltf.bufferViews[gltf.bufferViews.Count - 1].byteLength + gltf.bufferViews[gltf.bufferViews.Count - 1].byteOffset;
             }
             var bufferIndex = 0;
-            var vec3View = gltfUtil.addBufferView(bufferIndex, byteOffset, 4 * v3ds.Count);
+            var vec3View = glTFUtil.addBufferView(bufferIndex, byteOffset, 4 * v3ds.Count);
             vec3View.target = Targets.ARRAY_BUFFER;
             gltf.bufferViews.Add(vec3View);
-            var vecAccessor = gltfUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.FLOAT, v3ds.Count / 3, AccessorType.VEC3);
+            var vecAccessor = glTFUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.FLOAT, v3ds.Count / 3, AccessorType.VEC3);
             gltf.accessors.Add(vecAccessor);
         }
 
@@ -58,23 +58,23 @@ namespace Revit2Gltf.glTF
             var length = bufferData.indexBuffer.Count;
             if (bufferData.indexMax > 65535)
             {
-                faceView = gltfUtil.addBufferView(bufferIndex, byteOffset, 4 * length);
+                faceView = glTFUtil.addBufferView(bufferIndex, byteOffset, 4 * length);
                 faceView.target = Targets.ELEMENT_ARRAY_BUFFER;
                 gltf.bufferViews.Add(faceView);
-                faceAccessor = gltfUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.UNSIGNED_INT, length, AccessorType.SCALAR);
+                faceAccessor = glTFUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.UNSIGNED_INT, length, AccessorType.SCALAR);
             }
             else
             {
                 var align = 0;
-                if (2 * length % 4 != 0)
+                if ((2 * length) % 4 != 0)
                 {
                     align = 2;
                     bufferData.indexAlign = 0x20;
                 }
-                faceView = gltfUtil.addBufferView(bufferIndex, byteOffset, 2 * length + align);
+                faceView = glTFUtil.addBufferView(bufferIndex, byteOffset, 2 * length + align);
                 faceView.target = Targets.ELEMENT_ARRAY_BUFFER;
                 gltf.bufferViews.Add(faceView);
-                faceAccessor = gltfUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.UNSIGNED_SHORT, length, AccessorType.SCALAR);
+                faceAccessor = glTFUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.UNSIGNED_SHORT, length, AccessorType.SCALAR);
             }
             gltf.accessors.Add(faceAccessor);
         }
@@ -88,10 +88,10 @@ namespace Revit2Gltf.glTF
                 byteOffset = gltf.bufferViews[gltf.bufferViews.Count - 1].byteLength + gltf.bufferViews[gltf.bufferViews.Count - 1].byteOffset;
             }
             var bufferIndex = 0;
-            var vec3View = gltfUtil.addBufferView(bufferIndex, byteOffset, 4 * uvs.Count);
+            var vec3View = glTFUtil.addBufferView(bufferIndex, byteOffset, 4 * uvs.Count);
             vec3View.target = Targets.ARRAY_BUFFER;
             gltf.bufferViews.Add(vec3View);
-            var vecAccessor = gltfUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.FLOAT, uvs.Count / 2, AccessorType.VEC2);
+            var vecAccessor = glTFUtil.addAccessor(gltf.bufferViews.Count - 1, 0, ComponentType.FLOAT, uvs.Count / 2, AccessorType.VEC2);
             gltf.accessors.Add(vecAccessor);
         }
 
@@ -116,24 +116,24 @@ namespace Revit2Gltf.glTF
         }
 
 
-        public static double[] GetVec3MinMax(List<double> vec3)
+        public static float[] GetVec3MinMax(List<float> vec3)
         {
-            List<double> xValues = new List<double>();
-            List<double> yValues = new List<double>();
-            List<double> zValues = new List<double>();
+            List<float> xValues = new List<float>();
+            List<float> yValues = new List<float>();
+            List<float> zValues = new List<float>();
             for (int i = 0; i < vec3.Count; i++)
             {
                 if ((i % 3) == 0) xValues.Add(vec3[i]);
                 if ((i % 3) == 1) yValues.Add(vec3[i]);
                 if ((i % 3) == 2) zValues.Add(vec3[i]);
             }
-            double maxX = xValues.Max();
-            double minX = xValues.Min();
-            double maxY = yValues.Max();
-            double minY = yValues.Min();
-            double maxZ = zValues.Max();
-            double minZ = zValues.Min();
-            return new double[] { minX, minY, minZ, maxX, maxY, maxZ };
+            float maxX = xValues.Max();
+            float minX = xValues.Min();
+            float maxY = yValues.Max();
+            float minY = yValues.Min();
+            float maxZ = zValues.Max();
+            float minZ = zValues.Min();
+            return new float[] { minX, minY, minZ, maxX, maxY, maxZ };
         }
 
 

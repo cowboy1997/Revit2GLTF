@@ -4,6 +4,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Win32;
 using Revit2Gltf.glTF;
+using System;
+using System.Diagnostics;
 using System.Windows;
 using Document = Autodesk.Revit.DB.Document;
 
@@ -19,20 +21,26 @@ namespace Revit2Gltf
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-
-
-            string path = string.Empty;
             SaveFileDialog fd = new SaveFileDialog();
             fd.Title = "exportGLTF";
             fd.Filter = "gltf文件|*.gltf";
+
             if (fd.ShowDialog()==true)
             {
-                glTFExportContext context = new glTFExportContext(doc, fd.FileName);
+
+                Stopwatch stopWatch = new Stopwatch();
+                //测量运行时间
+                stopWatch.Start();
+                glTFSetting setting = new glTFSetting();
+                setting.useDraco = true;
+                setting.fileName = fd.FileName;
+                glTFExportContext context = new glTFExportContext(doc, setting);
                 CustomExporter exporter = new CustomExporter(doc, context);
                 exporter.IncludeGeometricObjects = false;
                 exporter.ShouldStopOnError = true;
-                exporter.Export(doc.ActiveView);
-                MessageBox.Show("success");
+                exporter.Export(doc.ActiveView as View3D);
+                stopWatch.Stop();
+                MessageBox.Show("success! time is:"+ stopWatch.Elapsed.TotalSeconds +"s");
             }    
             return Result.Succeeded;
         }

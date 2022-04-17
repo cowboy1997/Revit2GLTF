@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Revit2Gltf.glTF
 {
@@ -37,15 +34,10 @@ namespace Revit2Gltf.glTF
 
     public class glTFVersion
     {
-        public string generator = "export";
+        public string generator = "exportGLTF by:https://github.com/cowboy1997/Revit2GLTF";
         public string version = "2.0";
         public Dictionary<string, object> extras { get; set; }
         public Dictionary<string, object> extensions { get; set; }
-    }
-
-    public class glTFExtras
-    {
-        public string upAxis { get; set; }
     }
 
     public class glTFScene
@@ -92,7 +84,7 @@ namespace Revit2Gltf.glTF
         public int? material { get; set; } = null;
         public ModeEnum mode { get; set; } = ModeEnum.TRIANGLES;
 
-        public PrimitiveExtensions extensions { get; set; }
+        public glTFPrimitiveExtensions extensions { get; set; }
     }
 
 
@@ -117,12 +109,12 @@ namespace Revit2Gltf.glTF
     }
 
 
-    public class PrimitiveExtensions
+    public class glTFPrimitiveExtensions
     {
-        public draco KHR_draco_mesh_compression { get; set; } = new draco();
+        public glTFDracoMesh KHR_draco_mesh_compression { get; set; } = new glTFDracoMesh();
     }
 
-    public class draco
+    public class glTFDracoMesh
     {
         public int? bufferView { get; set; } = null;
         public glTFAttribute attributes { get; set; } = new glTFAttribute();
@@ -144,7 +136,7 @@ namespace Revit2Gltf.glTF
         public int buffer { get; set; }
         public int byteOffset { get; set; }
         public int byteLength { get; set; }
-        public Targets target { get; set; }
+        public Targets? target { get; set; }
         public int? byteStride { get; set; }
 
         [JsonIgnore]
@@ -257,19 +249,22 @@ namespace Revit2Gltf.glTF
     public class glTFBinaryData
     {
 
-        public List<double> vertexBuffer { get; set; } = new List<double>();
+        public List<float> vertexBuffer { get; set; } = new List<float>();
 
 
-        public List<double> normalBuffer { get; set; } = new List<double>();
+        public List<float> normalBuffer { get; set; } = new List<float>();
 
         public List<int> indexBuffer { get; set; } = new List<int>();
 
-        public List<double> uvBuffer { get; set; } = new List<double>();
+        public List<float> uvBuffer { get; set; } = new List<float>();
 
         public List<int> batchidBuffer { get; set; } = new List<int>();
         public int? indexMax { get; set; }
-
         public int? indexAlign { get; set; }
+
+
+        public IntPtr dracoData { get; set; }
+        public int dracoSize { get; set; }
     }
 }
 
