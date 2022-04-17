@@ -25,7 +25,7 @@ namespace Revit2Gltf.glTF
         {
             string jsonStr = JsonConvert.SerializeObject(this, new JsonSerializerSettings
             {
-                Formatting = Formatting.Indented,
+                //Formatting = Formatting.Indented,
                 NullValueHandling = NullValueHandling.Ignore
             });
             return jsonStr;

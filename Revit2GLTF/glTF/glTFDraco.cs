@@ -27,9 +27,8 @@ namespace Revit2Gltf.glTF
             int num_obj_faces, int num_positions, int num_tex_coords, int num_normals,
             DracoEncoderOptions options, ref int length);
 
-        //[DllImport("DracoNet.dll", CallingConvention = CallingConvention.Cdecl)]
-        [DllImport(@"E:\draco\build\x64\Debug\DracoNet.dll", CallingConvention = CallingConvention.Cdecl)]
-        extern static void deleteDracoData(IntPtr data);
+        [DllImport("DracoNet.dll", CallingConvention = CallingConvention.Cdecl)]
+        public extern static void deleteDracoData(IntPtr data);
 
         struct DracoEncoderOptions
         {
@@ -47,8 +46,6 @@ namespace Revit2Gltf.glTF
             public int generic_quantization_bits;
             public int compression_level;
         };
-
-
         public static void compression(glTFBinaryData bufferData)
         {
             float[] positions = bufferData.vertexBuffer.ToArray();
@@ -108,11 +105,6 @@ namespace Revit2Gltf.glTF
             //    }
             //}
             //return length;
-        }
-
-        public static void deleteData(IntPtr data)
-        {
-            deleteDracoData(data);
         }
     }
 }

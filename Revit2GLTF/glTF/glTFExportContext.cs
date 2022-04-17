@@ -104,9 +104,18 @@ namespace Revit2Gltf.glTF
                                     writer.Write(*(byte*)memBytePtr);
                                     memBytePtr += 1;
                                 }
+                                
                             }
                             //释放c++内存
-                            glTFDraco.deleteData(data);
+                            try
+                            {
+                                glTFDraco.deleteDracoData(data);
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
                             int byteOffset = 0;
                             if (i>0)
                             {
