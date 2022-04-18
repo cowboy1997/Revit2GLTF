@@ -191,10 +191,6 @@ namespace Revit2Gltf.glTF
         {
             _curSymbolId = null;
             _element = doc.GetElement(elementId);
-            if(elementId.IntegerValue==211152)
-            {
-                var A = 1;
-            }
             curMapBinaryData = new Dictionary<string, glTFBinaryData>();
             return RenderNodeAction.Proceed;
         }

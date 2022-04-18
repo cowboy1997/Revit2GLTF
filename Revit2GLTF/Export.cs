@@ -31,7 +31,7 @@ namespace Revit2Gltf
                 //测量运行时间
                 stopWatch.Start();
                 glTFSetting setting = new glTFSetting();
-                setting.useDraco = true;
+                setting.useDraco = (bool)mainWindow.useDraco.IsChecked;
                 setting.fileName = mainWindow.fileName.Text;
                 glTFExportContext context = new glTFExportContext(doc, setting);
                 CustomExporter exporter = new CustomExporter(doc, context);
