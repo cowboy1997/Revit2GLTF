@@ -2,7 +2,7 @@
 
 #### 介绍
 
-这个一个revit导出gltf的开源库，支持revit2018~revit2022，项目依赖于revit，拥有极快的导出速度
+这个一个revit导出gltf的开源库，支持revit2018~revit2022，项目依赖于revit，拥有极快的导出速度和极高的压缩率
 
 
 #### 支持
