@@ -1,4 +1,30 @@
 # Revit2GLTF
 
-支持revit带材质导出GLTF
+#### 介绍
 
+这个一个revit导出gltf的开源库，支持revit2018~revit2022，项目依赖于revit，拥有极快的导出速度
+
+
+#### 支持
+
+1、支持revit带材质导出GLTF
+
+2、支持导出revit法向量、UV
+
+3、支持draco多线程压缩
+
+4、支持相同构件合并
+
+#### 安装教程
+
+1、直接下载编译好的安装包https://github.com/cowboy1997/Revit2GLTF/releases/download/Revit2GLTF/setup.exe
+
+2、或者打开sln编译Revit2GLTF模块（依赖RevitAPI、RevitAPIUI、Newtonsoft）。如果你想重新编译修改DracoNet需要重新引入draco的文件头和静态库
+
+#### 关于
+
+如果不懂，欢迎加入QQ群：835368069
+
+包括BIM开发，Cad开发，threejs开发，python，webAssembly等等的。
+
+大家喜欢可以加群一起卷起来！！卷卷卷卷！！！
