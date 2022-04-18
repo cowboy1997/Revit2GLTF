@@ -21,27 +21,26 @@ namespace Revit2Gltf
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-            SaveFileDialog fd = new SaveFileDialog();
-            fd.Title = "exportGLTF";
-            fd.Filter = "gltf文件|*.gltf";
 
-            if (fd.ShowDialog()==true)
+
+            MainWindow mainWindow = new MainWindow();
+
+            if(mainWindow.ShowDialog()==true)
             {
-
                 Stopwatch stopWatch = new Stopwatch();
                 //测量运行时间
                 stopWatch.Start();
                 glTFSetting setting = new glTFSetting();
                 setting.useDraco = true;
-                setting.fileName = fd.FileName;
+                setting.fileName = mainWindow.fileName.Text;
                 glTFExportContext context = new glTFExportContext(doc, setting);
                 CustomExporter exporter = new CustomExporter(doc, context);
                 exporter.IncludeGeometricObjects = false;
                 exporter.ShouldStopOnError = true;
                 exporter.Export(doc.ActiveView as View3D);
                 stopWatch.Stop();
-                MessageBox.Show("success! time is:"+ stopWatch.Elapsed.TotalSeconds +"s");
-            }    
+                MessageBox.Show("success! time is:" + stopWatch.Elapsed.TotalSeconds + "s");
+            }
             return Result.Succeeded;
         }
     }

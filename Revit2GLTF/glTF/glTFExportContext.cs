@@ -191,6 +191,10 @@ namespace Revit2Gltf.glTF
         {
             _curSymbolId = null;
             _element = doc.GetElement(elementId);
+            if(elementId.IntegerValue==211152)
+            {
+                var A = 1;
+            }
             curMapBinaryData = new Dictionary<string, glTFBinaryData>();
             return RenderNodeAction.Proceed;
         }
@@ -402,7 +406,7 @@ namespace Revit2Gltf.glTF
                             texture.sampler = 0;
                             glTF.textures.Add( texture);
                             glTFImage image = new glTFImage();
-                            string textureName = string.Format("{0}.png", m.Name);
+                            string textureName = Path.GetFileName(texturePath);
                             string dirName = "glTFImage";
                             string dir = Path.Combine(gltfOutDir, dirName);
                             if (!Directory.Exists(dir))
@@ -568,6 +572,10 @@ namespace Revit2Gltf.glTF
                 {
                     textureFolder = libraryPath.GetValue("LibraryPaths").ToString();
                     libraryPath.Close();
+                }
+                if (textureFolder == null)
+                {
+                    textureFolder = @"C:\Program Files (x86)\Common Files\Autodesk Shared\Materials\Textures\";
                 }
                 hklm.Close();
             }
