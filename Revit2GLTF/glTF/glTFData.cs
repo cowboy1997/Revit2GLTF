@@ -64,6 +64,7 @@ namespace Revit2Gltf.glTF
         public List<int> children { get; set; }
 
         public Dictionary<string, object> extensions { get; set; }
+        public Dictionary<string, object> extras { get; set; }
     }
 
 

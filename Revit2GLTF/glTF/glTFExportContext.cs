@@ -28,10 +28,11 @@ namespace Revit2Gltf.glTF
         private Dictionary<string, glTFBinaryData> curMapBinaryData = new Dictionary<string, glTFBinaryData>();
         private List<glTFBinaryData> allBinaryDatas;
 
-        private Dictionary<string, int> MapSymbolId =new Dictionary<string, int>();
+        private Dictionary<string, int> MapSymbolId = new Dictionary<string, int>();
         private string _curSymbolId;
         private Element _element;
 
+        private List<int> _elementInstanceNodelist = new List<int>();
 
         private List<glTFBufferView> dracoBufferViews;
         //draco多线程
@@ -104,7 +105,7 @@ namespace Revit2Gltf.glTF
                                     writer.Write(*(byte*)memBytePtr);
                                     memBytePtr += 1;
                                 }
-                                
+
                             }
                             //释放c++内存
                             try
@@ -117,11 +118,11 @@ namespace Revit2Gltf.glTF
                                 throw;
                             }
                             int byteOffset = 0;
-                            if (i>0)
+                            if (i > 0)
                             {
                                 byteOffset = dracoBufferViews[i - 1].byteLength + dracoBufferViews[i - 1].byteOffset;
                             }
-                            dracoBufferViews[i].byteOffset= byteOffset;
+                            dracoBufferViews[i].byteOffset = byteOffset;
                             dracoBufferViews[i].byteLength = size;
                         }
                     }
@@ -189,6 +190,7 @@ namespace Revit2Gltf.glTF
 
         public RenderNodeAction OnElementBegin(ElementId elementId)
         {
+            _elementInstanceNodelist.Clear();
             _curSymbolId = null;
             _element = doc.GetElement(elementId);
             curMapBinaryData = new Dictionary<string, glTFBinaryData>();
@@ -216,7 +218,7 @@ namespace Revit2Gltf.glTF
             ElementId symId = node.GetSymbolId();
             Element symElem = doc.GetElement(symId);
             _curSymbolId = symElem.UniqueId;
-            if(MapSymbolId.ContainsKey(symElem.UniqueId))
+            if (MapSymbolId.ContainsKey(symElem.UniqueId))
             {
                 return RenderNodeAction.Skip;
             }
@@ -225,13 +227,14 @@ namespace Revit2Gltf.glTF
 
         public void OnInstanceEnd(InstanceNode node)
         {
-            if (MapSymbolId.ContainsKey(_curSymbolId))
+            ElementId symId = node.GetSymbolId();
+            Element symElem = doc.GetElement(symId);
+            if (MapSymbolId.ContainsKey(symElem.UniqueId))
             {
                 var gltfNode = new glTFNode();
                 gltfNode.name = _element.Name;
-                gltfNode.mesh = glTF.nodes.Count-1;
-                glTF.nodes[0].children.Add(glTF.nodes.Count);
                 glTF.nodes.Add(gltfNode);
+                _elementInstanceNodelist.Add(glTF.nodes.Count - 1);
                 gltfNode.matrix = new List<double> {
                         CurrentTransform.BasisX.X, CurrentTransform.BasisX.Y, CurrentTransform.BasisX.Z, 0,
                         CurrentTransform.BasisY.X, CurrentTransform.BasisY.Y, CurrentTransform.BasisY.Z, 0,
@@ -242,15 +245,13 @@ namespace Revit2Gltf.glTF
             }
             else
             {
-                wiriteElement(_element.Id);
+                wiriteElementId(node.GetSymbolId(), true);
             }
-
-
             _transformStack.Pop();
         }
 
 
-        private void wiriteElement(ElementId elementId)
+        private void wiriteElementId(ElementId elementId, bool isInstance)
         {
             if (curMapBinaryData.Keys.Count > 0)
             {
@@ -258,22 +259,36 @@ namespace Revit2Gltf.glTF
                 var node = new glTFNode();
                 node.name = e.Name;
 
+
                 var meshID = glTF.meshes.Count;
                 node.mesh = meshID;
 
-                if (_curSymbolId != null&& !CurrentTransform.IsIdentity)
+
+                if (_curSymbolId != null && !CurrentTransform.IsIdentity)
                 {
-                    MapSymbolId.Add(_curSymbolId, meshID);
+                    if (!MapSymbolId.ContainsKey(_curSymbolId))
+                    {
+                        MapSymbolId.Add(_curSymbolId, meshID);
+                    }
                     Transform t = CurrentTransform;
                     node.matrix = new List<double> {
                         t.BasisX.X, t.BasisX.Y, t.BasisX.Z, 0,
                         t.BasisY.X, t.BasisY.Y, t.BasisY.Z, 0,
                         t.BasisZ.X, t.BasisZ.Y, t.BasisZ.Z, 0,
-                        t.Origin.X, t.Origin.Y, t.Origin.Z, 1,
-                    };
+                        t.Origin.X, t.Origin.Y, t.Origin.Z, 1};
                 }
-                glTF.nodes[0].children.Add(glTF.nodes.Count);
                 glTF.nodes.Add(node);
+                if (isInstance)
+                {
+                    _elementInstanceNodelist.Add(glTF.nodes.Count - 1);
+                }
+                else
+                {
+                    node.extras = new Dictionary<string, object>();
+                    node.extras.Add("ElementID", e.Id.IntegerValue);
+                    node.extras.Add("UniqueId", e.UniqueId);
+                    glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
+                }
                 var mesh = new glTFMesh();
                 glTF.meshes.Add(mesh);
                 mesh.primitives = new List<glTFMeshPrimitive>();
@@ -327,6 +342,30 @@ namespace Revit2Gltf.glTF
             }
         }
 
+        private void wiriteElement(ElementId elementId)
+        {
+            if (_elementInstanceNodelist.Count == 0 && curMapBinaryData.Keys.Count > 0)
+            {
+                wiriteElementId(elementId, false);
+            }
+            else if (_elementInstanceNodelist.Count > 0)
+            {
+                var e = doc.GetElement(elementId);
+                var node = new glTFNode();
+                node.name = e.Name;
+                glTF.nodes[0].children.Add(glTF.nodes.Count);
+                glTF.nodes.Add(node);
+                node.children = new List<int>();
+                node.children.AddRange(_elementInstanceNodelist);
+                node.extras = new Dictionary<string, object>();
+                node.extras.Add("ElementID", e.Id.IntegerValue);
+                node.extras.Add("UniqueId", e.UniqueId);
+            }
+        }
+
+
+
+
         public void OnLight(LightNode node)
         {
         }
@@ -352,7 +391,7 @@ namespace Revit2Gltf.glTF
             {
                 Element m = doc.GetElement(node.MaterialId);
                 curMaterialName = m.Name;
-                if(!MapMaterial.ContainsKey(curMaterialName))
+                if (!MapMaterial.ContainsKey(curMaterialName))
                 {
                     glTFMaterial gl_mat = new glTFMaterial();
                     gl_mat.name = curMaterialName;
@@ -386,7 +425,7 @@ namespace Revit2Gltf.glTF
                         if (File.Exists(texturePath))
                         {
 
-                            if (glTF.textures==null)
+                            if (glTF.textures == null)
                             {
                                 glTF.samplers = new List<glTFSampler>();
                                 glTF.images = new List<glTFImage>();
@@ -400,19 +439,19 @@ namespace Revit2Gltf.glTF
                             glTFTexture texture = new glTFTexture();
                             texture.source = glTF.images.Count;
                             texture.sampler = 0;
-                            glTF.textures.Add( texture);
+                            glTF.textures.Add(texture);
                             glTFImage image = new glTFImage();
                             string textureName = Path.GetFileName(texturePath);
                             string dirName = "glTFImage";
                             string dir = Path.Combine(gltfOutDir, dirName);
                             if (!Directory.Exists(dir))
-                            { 
+                            {
                                 Directory.CreateDirectory(dir);
                             }
                             File.Copy(texturePath, Path.Combine(dir, textureName), true);
                             image.uri = dirName + "/" + textureName;
                             glTF.images.Add(image);
-                            if (glTF.samplers.Count==0)
+                            if (glTF.samplers.Count == 0)
                             {
                                 glTFSampler sampler = new glTFSampler();
                                 sampler.magFilter = 9729;
@@ -518,7 +557,7 @@ namespace Revit2Gltf.glTF
                 currentGeometry.indexBuffer.Add(index2);
                 currentGeometry.indexBuffer.Add(index3);
 
-                if(index1>currentGeometry.indexMax)
+                if (index1 > currentGeometry.indexMax)
                 {
                     currentGeometry.indexMax = index1;
                 }
@@ -579,6 +618,9 @@ namespace Revit2Gltf.glTF
             {
                 textureFolder = @"C:\Program Files (x86)\Common Files\Autodesk Shared\Materials\Textures\";
             }
+
+
+
             return true;
         }
     }
