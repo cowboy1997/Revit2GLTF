@@ -43,7 +43,9 @@ namespace Revit2Gltf
         {
             SaveFileDialog fd = new SaveFileDialog();
             fd.Title = "exportGLTF";
-            fd.Filter = "gltf文件|*.gltf";
+            //fd.Filter = "gltf文件|*.gltf";
+            //fd.Filter = "gltf文件(*.gltf,*.glb)|*.gltf;*.glb";
+            fd.Filter = "glb文件(*.glb)|*.glb|gltf文件(*.gltf)|*.gltf";
             fd.FileName = "NewProject";
             if (fd.ShowDialog() == true)
             {

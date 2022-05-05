@@ -32,6 +32,24 @@ namespace Revit2Gltf.glTF
         }
     }
 
+    public class GLB
+    {
+
+        public const uint Magic = 0x46546C67;
+
+        public const uint Version = 2;
+
+        public const uint HeaderLength = sizeof(uint) + sizeof(uint) + sizeof(int);
+
+        public const uint ChunkHeaderLength = sizeof(uint) + sizeof(uint);
+
+        public const uint ChunkFormatJson = 0x4E4F534A;
+
+        public const uint ChunkFormatBin = 0x004E4942;
+    }
+
+
+
     public class glTFVersion
     {
         public string generator = "exportGLTF by:https://github.com/cowboy1997/Revit2GLTF";
@@ -66,6 +84,18 @@ namespace Revit2Gltf.glTF
         public Dictionary<string, object> extensions { get; set; }
         public Dictionary<string, object> extras { get; set; }
     }
+
+    public class glTFParameterGroup
+    {
+        public string GroupName { get; set; }
+        public List<glTFParameter> Parameters { get; set; }
+    }
+    public class glTFParameter
+    {
+        public string value { get; set; }
+        public string name { get; set; }
+    }
+
 
 
     public class glTFMesh

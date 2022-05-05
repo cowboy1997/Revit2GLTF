@@ -6,6 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB.Visual;
 using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Revit2Gltf.glTF
 {
@@ -81,138 +84,180 @@ namespace Revit2Gltf.glTF
 
         public void Finish()
         {
-            if (setting.useDraco)
+            MemoryStream memoryStream = new MemoryStream();
+            using (BinaryWriter writer = new BinaryWriter(memoryStream))
             {
-                //等待线程结束
-                Task.WaitAll(taskList.ToArray());
-
-                var binFileName = Path.GetFileNameWithoutExtension(setting.fileName) + ".bin";
-                using (FileStream f = File.Create(Path.Combine(gltfOutDir, binFileName)))
+                if (setting.useDraco)
                 {
-                    using (BinaryWriter writer = new BinaryWriter(f))
+                    //等待线程结束
+                    Task.WaitAll(taskList.ToArray());
+                    var Binarylength = allBinaryDatas.Count;
+                    for (int i = 0; i < Binarylength; i++)
                     {
-                        var length = allBinaryDatas.Count;
-                        for (int i = 0; i < length; i++)
+                        var binData = allBinaryDatas[i];
+                        var data = binData.dracoData;
+                        var size = binData.dracoSize;
+                        unsafe
                         {
-                            var binData = allBinaryDatas[i];
-                            var data = binData.dracoData;
-                            var size = binData.dracoSize;
-                            unsafe
+                            byte* memBytePtr = (byte*)data.ToPointer();
+                            for (int j = 0; j < size; j++)
                             {
-                                byte* memBytePtr = (byte*)data.ToPointer();
-                                for (int j = 0; j < size; j++)
-                                {
-                                    writer.Write(*(byte*)memBytePtr);
-                                    memBytePtr += 1;
-                                }
+                                writer.Write(*(byte*)memBytePtr);
+                                memBytePtr += 1;
+                            }
 
-                            }
-                            //释放c++内存
-                            try
-                            {
-                                glTFDraco.deleteDracoData(data);
-                            }
-                            catch (Exception)
-                            {
-
-                                throw;
-                            }
-                            int byteOffset = 0;
-                            if (i > 0)
-                            {
-                                byteOffset = dracoBufferViews[i - 1].byteLength + dracoBufferViews[i - 1].byteOffset;
-                            }
-                            dracoBufferViews[i].byteOffset = byteOffset;
-                            dracoBufferViews[i].byteLength = size;
                         }
-                        glTF.bufferViews = dracoBufferViews;
-                        foreach (var accessor in glTF.accessors)
+                        //释放c++内存
+                        try
                         {
-                            accessor.bufferView = null;
-                            accessor.byteOffset = null;
+                            glTFDraco.deleteDracoData(data);
                         }
-                        foreach (var image in glTF.images)
+                        catch (Exception)
                         {
-                            image.bufferView = glTF.bufferViews.Count;
 
-                            var bytes = File.ReadAllBytes(image.uri);
-                            var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
-                            var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
-                            image.uri = null;
-                            foreach (var b in bytes)
-                            {
-                                writer.Write(b);
-                            }
-                            glTF.bufferViews.Add(imageView);
+                            throw;
                         }
+                        int byteOffset = 0;
+                        if (i > 0)
+                        {
+                            byteOffset = dracoBufferViews[i - 1].byteLength + dracoBufferViews[i - 1].byteOffset;
+                        }
+                        dracoBufferViews[i].byteOffset = byteOffset;
+                        dracoBufferViews[i].byteLength = size;
+                    }
+                    glTF.bufferViews = dracoBufferViews;
+                    foreach (var accessor in glTF.accessors)
+                    {
+                        accessor.bufferView = null;
+                        accessor.byteOffset = null;
+                    }
+                    foreach (var image in glTF.images)
+                    {
+                        image.bufferView = glTF.bufferViews.Count;
 
+                        var bytes = File.ReadAllBytes(image.uri);
+                        var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
+                        var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
+                        image.uri = null;
+                        foreach (var b in bytes)
+                        {
+                            writer.Write(b);
+                        }
+                        glTF.bufferViews.Add(imageView);
                     }
                 }
-               
-            }
-            else
-            {
-                var binFileName = Path.GetFileNameWithoutExtension(setting.fileName) + ".bin";
-                using (FileStream f = File.Create(Path.Combine(gltfOutDir, binFileName)))
+                else
                 {
-                    using (BinaryWriter writer = new BinaryWriter(f))
+                    foreach (var binData in allBinaryDatas)
                     {
-                        foreach (var binData in allBinaryDatas)
+                        foreach (var index in binData.indexBuffer)
                         {
-                            foreach (var index in binData.indexBuffer)
+                            if (binData.indexMax > 65535)
                             {
-                                if (binData.indexMax > 65535)
-                                {
-                                    writer.Write((uint)index);
-                                }
-                                else
-                                {
-                                    writer.Write((ushort)index);
-                                }
+                                writer.Write((uint)index);
                             }
-                            if (binData.indexAlign != null && binData.indexAlign != 0)
+                            else
                             {
-                                writer.Write((ushort)binData.indexAlign);
-                            }
-                            foreach (var coord in binData.vertexBuffer)
-                            {
-                                writer.Write((float)coord);
-                            }
-                            foreach (var normal in binData.normalBuffer)
-                            {
-                                writer.Write((float)normal);
-                            }
-                            foreach (var uv in binData.uvBuffer)
-                            {
-                                writer.Write((float)uv);
+                                writer.Write((ushort)index);
                             }
                         }
-
-                        foreach (var image in glTF.images)
+                        if (binData.indexAlign != null && binData.indexAlign != 0)
                         {
-                            image.bufferView = glTF.bufferViews.Count;
-
-                            var bytes = File.ReadAllBytes(image.uri);
-                            var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
-                            var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
-                            
-                            image.uri = null;
-                            foreach (var b in bytes)
-                            {
-                                writer.Write(b);
-                            }
-                            glTF.bufferViews.Add(imageView);
+                            writer.Write((ushort)binData.indexAlign);
+                        }
+                        foreach (var coord in binData.vertexBuffer)
+                        {
+                            writer.Write((float)coord);
+                        }
+                        foreach (var normal in binData.normalBuffer)
+                        {
+                            writer.Write((float)normal);
+                        }
+                        foreach (var uv in binData.uvBuffer)
+                        {
+                            writer.Write((float)uv);
                         }
                     }
+
+                    foreach (var image in glTF.images)
+                    {
+                        image.bufferView = glTF.bufferViews.Count;
+
+                        var bytes = File.ReadAllBytes(image.uri);
+                        var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
+                        var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
+
+                        image.uri = null;
+                        foreach (var b in bytes)
+                        {
+                            writer.Write(b);
+                        }
+                        glTF.bufferViews.Add(imageView);
+                    }
+
                 }
 
-            }
+
+            }   
             glTFBuffer newbuffer = new glTFBuffer();
             newbuffer.uri = Path.GetFileNameWithoutExtension(setting.fileName) + ".bin";
             newbuffer.byteLength = glTF.bufferViews[glTF.bufferViews.Count() - 1].byteOffset +
                          glTF.bufferViews[glTF.bufferViews.Count() - 1].byteLength;
             glTF.buffers = new List<glTFBuffer>() { newbuffer };
-            File.WriteAllText(setting.fileName, glTF.toJson());
+            var fileExtension = Path.GetExtension(setting.fileName).ToLower();
+            if (fileExtension == ".gltf")
+            {
+                var binFileName = Path.GetFileNameWithoutExtension(setting.fileName) + ".bin";
+                using (FileStream f = File.Create(Path.Combine(gltfOutDir, binFileName)))
+                {
+                    byte[] data = memoryStream.ToArray();
+                    f.Write(data, 0, data.Length);
+                }
+                File.WriteAllText(setting.fileName, glTF.toJson());
+            }
+            else if (fileExtension == ".glb")
+            {
+                using (var fileStream = File.Create(setting.fileName))
+                using (var writer = new BinaryWriter(fileStream))
+                {
+                    newbuffer.uri = null;
+                    writer.Write(GLB.Magic);
+                    writer.Write(GLB.Version);
+                    var chunksPosition = writer.BaseStream.Position;
+                    writer.Write(0U);
+                    var jsonChunkPosition = writer.BaseStream.Position;
+                    writer.Write(0U);
+                    writer.Write(GLB.ChunkFormatJson);
+                    using (var streamWriter = new StreamWriter(writer.BaseStream, new UTF8Encoding(false, true), 1024, true))
+                    using (var jsonTextWriter = new JsonTextWriter(streamWriter))
+                    {
+                        JObject json = JObject.Parse(glTF.toJson());
+                        json.WriteTo(jsonTextWriter);
+                    }
+                    glTFUtil.Align(writer.BaseStream, 0x20);
+                    var jsonChunkLength = checked((uint)(writer.BaseStream.Length - jsonChunkPosition)) - GLB.ChunkHeaderLength;
+                    writer.BaseStream.Seek(jsonChunkPosition, SeekOrigin.Begin);
+                    writer.Write(jsonChunkLength);
+                    byte[] data = memoryStream.ToArray();
+                    writer.BaseStream.Seek(0, SeekOrigin.End);
+                    var binChunkPosition = writer.BaseStream.Position;
+                    writer.Write(0);
+                    writer.Write(GLB.ChunkFormatBin);
+                    foreach (var b in data)
+                    {
+                        writer.Write(b);
+                    }
+                    glTFUtil.Align(writer.BaseStream, 0x20);
+                    var binChunkLength = checked((uint)(writer.BaseStream.Length - binChunkPosition)) - GLB.ChunkHeaderLength;
+                    writer.BaseStream.Seek(binChunkPosition, SeekOrigin.Begin);
+                    writer.Write(binChunkLength);
+                    var length = checked((uint)writer.BaseStream.Length);
+                    writer.BaseStream.Seek(chunksPosition, SeekOrigin.Begin);
+                    writer.Write(length);
+                }
+            }
+            memoryStream.Dispose();
+
         }
 
         public bool IsCanceled()
@@ -319,6 +364,7 @@ namespace Revit2Gltf.glTF
                     node.extras = new Dictionary<string, object>();
                     node.extras.Add("ElementID", e.Id.IntegerValue);
                     node.extras.Add("UniqueId", e.UniqueId);
+                    node.extras.Add("Parameters", glTFUtil.GetParameter(e));
                     glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
                 }
                 var mesh = new glTFMesh();
@@ -392,6 +438,7 @@ namespace Revit2Gltf.glTF
                 node.extras = new Dictionary<string, object>();
                 node.extras.Add("ElementID", e.Id.IntegerValue);
                 node.extras.Add("UniqueId", e.UniqueId);
+                node.extras.Add("Parameters",glTFUtil.GetParameter(e));
             }
         }
 

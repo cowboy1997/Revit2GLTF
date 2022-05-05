@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB.Visual;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Visual;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -105,10 +106,6 @@ namespace Revit2Gltf.glTF
             return bufferView;
         }
 
-        public static int GetFileLength(string path)
-        {
-            return checked((int)new FileInfo(path).Length);
-        }
 
         public static glTFAccessor addAccessor(int bufferView, int byteOffset, ComponentType componentType,int count, string type)
         {
@@ -141,6 +138,60 @@ namespace Revit2Gltf.glTF
             float minZ = zValues.Min();
             return new float[] { minX, minY, minZ, maxX, maxY, maxZ };
         }
+
+
+
+        public static void Align(Stream stream, byte pad = 0)
+        {
+            var count = 3 - ((stream.Position - 1) & 3);
+            while (count != 0)
+            {
+                stream.WriteByte(pad);
+                count--;
+            }
+        }
+
+        public static List<glTFParameterGroup> GetParameter(Element element)
+        {
+            var parameterGroupMap = new Dictionary<string, glTFParameterGroup>();
+            IList<Parameter> parameters = element.GetOrderedParameters();
+            foreach (Parameter p in parameters)
+            {
+                string GroupName = LabelUtils.GetLabelFor(p.Definition.ParameterGroup);
+                var parameter = new glTFParameter();
+                parameter.name = p.Definition.Name;
+                if (StorageType.String == p.StorageType)
+                {
+                    parameter.value = p.AsString();
+                }
+                else if (StorageType.Double == p.StorageType)
+                {
+                    parameter.value = p.AsValueString();
+                }
+
+                if (parameterGroupMap.ContainsKey(GroupName))
+                {
+                    var propertySet = parameterGroupMap[GroupName];
+                    propertySet.Parameters.Add(parameter);
+                }
+                else
+                {
+                    var propertySet = new glTFParameterGroup();
+                    propertySet.GroupName = GroupName;
+                    propertySet.Parameters = new List<glTFParameter>();
+                    propertySet.Parameters.Add(parameter);
+                    parameterGroupMap.Add(GroupName, propertySet);
+                }
+            }
+
+            var parameterGroups = new List<glTFParameterGroup>();
+            foreach (var item in parameterGroupMap.Values)
+            {
+                parameterGroups.Add(item);
+            }
+            return parameterGroups;
+        }
+
 
 
         public static string FromFileExtension(string fileExtension)
