@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB.Visual;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,6 +105,11 @@ namespace Revit2Gltf.glTF
             return bufferView;
         }
 
+        public static int GetFileLength(string path)
+        {
+            return checked((int)new FileInfo(path).Length);
+        }
+
         public static glTFAccessor addAccessor(int bufferView, int byteOffset, ComponentType componentType,int count, string type)
         {
             var accessor = new glTFAccessor();
@@ -136,6 +142,22 @@ namespace Revit2Gltf.glTF
             return new float[] { minX, minY, minZ, maxX, maxY, maxZ };
         }
 
+
+        public static string FromFileExtension(string fileExtension)
+        {
+            switch (fileExtension.ToLower())
+            {
+                case ".png":
+                    return "image/png";
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+                case ".dds":
+                    return "image/vnd-ms.dds";
+            }
+            return "image/png";
+
+        }
 
 
         public static string ReadAssetProperty(AssetProperty prop)

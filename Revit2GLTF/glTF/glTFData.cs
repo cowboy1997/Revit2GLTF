@@ -207,8 +207,13 @@ namespace Revit2Gltf.glTF
         public glTFbaseColorTexture baseColorTexture { get; set; }
 
         public List<double> baseColorFactor { get; set; }
-
+        /// <summary>
+        /// 金属度，范围从0（非金属）到1（金属）
+        /// </summary>
         public double? metallicFactor { get; set; }
+        /// <summary>
+        /// 粗糙度，范围从0.0（平滑）到1.0（粗糙）。
+        /// </summary>
         public double? roughnessFactor { get; set; }
     }
 
@@ -233,6 +238,11 @@ namespace Revit2Gltf.glTF
 
         public string uri { get; set; }
 
+        public int? bufferView { get; set; }
+
+        public string mimeType { get; set; }
+
+        public string name { get; set; }
     }
 
     public class glTFSampler

@@ -125,14 +125,30 @@ namespace Revit2Gltf.glTF
                             dracoBufferViews[i].byteOffset = byteOffset;
                             dracoBufferViews[i].byteLength = size;
                         }
+                        glTF.bufferViews = dracoBufferViews;
+                        foreach (var accessor in glTF.accessors)
+                        {
+                            accessor.bufferView = null;
+                            accessor.byteOffset = null;
+                        }
+                        foreach (var image in glTF.images)
+                        {
+                            image.bufferView = glTF.bufferViews.Count;
+
+                            var bytes = File.ReadAllBytes(image.uri);
+                            var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
+                            var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
+                            image.uri = null;
+                            foreach (var b in bytes)
+                            {
+                                writer.Write(b);
+                            }
+                            glTF.bufferViews.Add(imageView);
+                        }
+
                     }
                 }
-                glTF.bufferViews = dracoBufferViews;
-                foreach (var accessor in glTF.accessors)
-                {
-                    accessor.bufferView = null;
-                    accessor.byteOffset = null;
-                }
+               
             }
             else
             {
@@ -170,6 +186,22 @@ namespace Revit2Gltf.glTF
                             {
                                 writer.Write((float)uv);
                             }
+                        }
+
+                        foreach (var image in glTF.images)
+                        {
+                            image.bufferView = glTF.bufferViews.Count;
+
+                            var bytes = File.ReadAllBytes(image.uri);
+                            var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
+                            var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
+                            
+                            image.uri = null;
+                            foreach (var b in bytes)
+                            {
+                                writer.Write(b);
+                            }
+                            glTF.bufferViews.Add(imageView);
                         }
                     }
                 }
@@ -403,11 +435,19 @@ namespace Revit2Gltf.glTF
                         alpha = 1 - alpha;
                     }
                     pbr.metallicFactor = 0f;
+                    // pbr.roughnessFactor = 1 - node.Smoothness / 100;
                     pbr.roughnessFactor = 1f;
                     gl_mat.pbrMetallicRoughness = pbr;
                     gl_mat.index = glTF.materials.Count;
                     glTF.materials.Add(gl_mat);
+                    try
+                    {
+                        pbr.baseColorFactor = new List<double>() { node.Color.Red / 255f, node.Color.Green / 255f, node.Color.Blue / 255f, alpha / 1f };
+                    }
+                    catch
+                    {
 
+                    }
                     Asset currentAsset = null;
                     if (node.HasOverriddenAppearance)
                     {
@@ -424,15 +464,13 @@ namespace Revit2Gltf.glTF
                         var texturePath = Path.Combine(textureFolder, textureFile.Replace("/", "\\"));
                         if (File.Exists(texturePath))
                         {
-
                             if (glTF.textures == null)
                             {
                                 glTF.samplers = new List<glTFSampler>();
                                 glTF.images = new List<glTFImage>();
                                 glTF.textures = new List<glTFTexture>();
                             }
-
-
+                            pbr.baseColorFactor = null;
                             glTFbaseColorTexture bct = new glTFbaseColorTexture();
                             bct.index = glTF.textures.Count;
                             pbr.baseColorTexture = bct;
@@ -441,15 +479,18 @@ namespace Revit2Gltf.glTF
                             texture.sampler = 0;
                             glTF.textures.Add(texture);
                             glTFImage image = new glTFImage();
-                            string textureName = Path.GetFileName(texturePath);
-                            string dirName = "glTFImage";
-                            string dir = Path.Combine(gltfOutDir, dirName);
-                            if (!Directory.Exists(dir))
-                            {
-                                Directory.CreateDirectory(dir);
-                            }
-                            File.Copy(texturePath, Path.Combine(dir, textureName), true);
-                            image.uri = dirName + "/" + textureName;
+                            image.name = Path.GetFileNameWithoutExtension(texturePath);
+                            image.mimeType = glTFUtil.FromFileExtension(texturePath);
+                            image.uri = texturePath;
+                            //string textureName = Path.GetFileName(texturePath);
+                            //string dirName = "glTFImage";
+                            //string dir = Path.Combine(gltfOutDir, dirName);
+                            //if (!Directory.Exists(dir))
+                            //{
+                            //    Directory.CreateDirectory(dir);
+                            //}
+                            //File.Copy(texturePath, Path.Combine(dir, textureName), true);
+                            //image.uri = dirName + "/" + textureName;
                             glTF.images.Add(image);
                             if (glTF.samplers.Count == 0)
                             {
@@ -463,25 +504,7 @@ namespace Revit2Gltf.glTF
                         }
                         else
                         {
-                            try
-                            {
-                                pbr.baseColorFactor = new List<double>() { node.Color.Red / 255f, node.Color.Green / 255f, node.Color.Blue / 255f, alpha / 1f };
-                            }
-                            catch
-                            {
-
-                            }
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            pbr.baseColorFactor = new List<double>() { node.Color.Red / 255f, node.Color.Green / 255f, node.Color.Blue / 255f, alpha / 1f };
-                        }
-                        catch
-                        {
-
+                            
                         }
                     }
                     MapMaterial.Add(curMaterialName, gl_mat);
