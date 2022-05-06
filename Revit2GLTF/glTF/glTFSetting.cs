@@ -10,6 +10,7 @@ namespace Revit2Gltf.glTF
     {
         public bool useDraco { get; set; } = false;
         public string fileName { get; set; }
-        public bool ExportGlb { get; set; } = false;
+
+        public bool exportProperty { get; set; } = false;
     }
 }

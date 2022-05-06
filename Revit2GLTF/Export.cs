@@ -33,13 +33,21 @@ namespace Revit2Gltf
                 glTFSetting setting = new glTFSetting();
                 setting.useDraco = (bool)mainWindow.useDraco.IsChecked;
                 setting.fileName = mainWindow.fileName.Text;
+                setting.exportProperty = (bool)mainWindow.exportProperty.IsChecked;
                 glTFExportContext context = new glTFExportContext(doc, setting);
                 CustomExporter exporter = new CustomExporter(doc, context);
                 exporter.IncludeGeometricObjects = false;
                 exporter.ShouldStopOnError = true;
                 exporter.Export(doc.ActiveView as View3D);
                 stopWatch.Stop();
-                MessageBox.Show("success! time is:" + stopWatch.Elapsed.TotalSeconds + "s");
+
+
+                TaskDialog mainDialog = new TaskDialog("Revit2GLTF");
+                mainDialog.MainContent = "success! time is:" + stopWatch.Elapsed.TotalSeconds + "s" + "\n"+
+                     "<a href=\"https://cowboy1997.github.io/Revit2GLTF/threejs/index?\">" + "open your glb model</a>"; ;
+                //mainDialog.FooterText = "<a href=\"https://cowboy1997.github.io/Revit2GLTF/threejs/index?\">"+ "open your glb model</a>";
+                mainDialog.Show();
+
             }
             return Result.Succeeded;
         }

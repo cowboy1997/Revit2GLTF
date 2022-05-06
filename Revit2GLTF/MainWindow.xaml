@@ -12,8 +12,9 @@
         <TextBox  x:Name="fileName" HorizontalAlignment="Left" Height="23" Margin="95,7,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="267"/>
         <Button Content="open" HorizontalAlignment="Left" Margin="388,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Open"/>
         <CheckBox x:Name="useDraco" Content="use draco" HorizontalAlignment="Left" Margin="203,44,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <Button Content="start" HorizontalAlignment="Left" Margin="204,81,0,0" VerticalAlignment="Top" Width="75" Click="Button_Start"/>
-        <TextBlock Margin="115,129,-115,-129">
+        <CheckBox x:Name="exportProperty" Content="Export Revit Property set" HorizontalAlignment="Left" Margin="203,75,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Button Content="start" HorizontalAlignment="Left" Margin="203,110,0,0" VerticalAlignment="Top" Width="75" Click="Button_Start"/>
+        <TextBlock Margin="116,142,-116,-142">
             <Hyperlink NavigateUri="https://github.com/cowboy1997/Revit2GLTF" Click="Hyperlink_Click">
                 https://github.com/cowboy1997/Revit2GLTF
             </Hyperlink>

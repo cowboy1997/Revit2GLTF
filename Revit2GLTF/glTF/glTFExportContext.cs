@@ -364,7 +364,10 @@ namespace Revit2Gltf.glTF
                     node.extras = new Dictionary<string, object>();
                     node.extras.Add("ElementID", e.Id.IntegerValue);
                     node.extras.Add("UniqueId", e.UniqueId);
-                    node.extras.Add("Parameters", glTFUtil.GetParameter(e));
+                    if(setting.exportProperty)
+                    {
+                        node.extras.Add("Parameters", glTFUtil.GetParameter(e));
+                    }
                     glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
                 }
                 var mesh = new glTFMesh();
@@ -438,7 +441,10 @@ namespace Revit2Gltf.glTF
                 node.extras = new Dictionary<string, object>();
                 node.extras.Add("ElementID", e.Id.IntegerValue);
                 node.extras.Add("UniqueId", e.UniqueId);
-                node.extras.Add("Parameters",glTFUtil.GetParameter(e));
+                if (setting.exportProperty)
+                {
+                    node.extras.Add("Parameters", glTFUtil.GetParameter(e));
+                }
             }
         }
 
