@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>WebCad</title>
+    <script type="text/javascript" src="lib/jquery.js"> </script>
+    <script type="text/javascript" src="lib/jstree.min.js"> </script>
+</head>
+<body>
+    <div id="topnav" class="topnav">
+        <label id="fileInputbyWasm" for="file2s" title="Import ifc from File">open IFC
+            <input id="file2s" name="files2" type="file" accept=".ifc" multiple style="display:none;"/>
+        </label>
+        <label id="fileInputGLTF" for="fileGLTF" title="Import ifc from File">open GLTF
+            <input id="fileGLTF" name="fileGLTF" type="file" accept=".glb" multiple style="display:none;"/>
+        </label>
+    </div>
+    <script type="text/javascript" src="dist/app.js"> </script>
+</body>
+
+</html>
