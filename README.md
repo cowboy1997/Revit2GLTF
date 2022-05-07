@@ -16,6 +16,10 @@
 
 4、支持相同构件合并
 
+5、支持导出gltf/glb
+
+6、支持导出revit属性
+
 #### 安装教程
 
 1、直接下载编译好的安装包https://github.com/cowboy1997/Revit2GLTF/releases/download/Revit2GLTF/Setup.msi
