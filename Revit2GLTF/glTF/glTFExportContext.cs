@@ -131,19 +131,22 @@ namespace Revit2Gltf.glTF
                         accessor.bufferView = null;
                         accessor.byteOffset = null;
                     }
-                    foreach (var image in glTF.images)
+                    if(glTF.images!=null)
                     {
-                        image.bufferView = glTF.bufferViews.Count;
-
-                        var bytes = File.ReadAllBytes(image.uri);
-                        var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
-                        var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
-                        image.uri = null;
-                        foreach (var b in bytes)
+                        foreach (var image in glTF.images)
                         {
-                            writer.Write(b);
+                            image.bufferView = glTF.bufferViews.Count;
+
+                            var bytes = File.ReadAllBytes(image.uri);
+                            var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
+                            var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
+                            image.uri = null;
+                            foreach (var b in bytes)
+                            {
+                                writer.Write(b);
+                            }
+                            glTF.bufferViews.Add(imageView);
                         }
-                        glTF.bufferViews.Add(imageView);
                     }
                 }
                 else
@@ -178,23 +181,24 @@ namespace Revit2Gltf.glTF
                             writer.Write((float)uv);
                         }
                     }
-
-                    foreach (var image in glTF.images)
+                    if (glTF.images != null)
                     {
-                        image.bufferView = glTF.bufferViews.Count;
-
-                        var bytes = File.ReadAllBytes(image.uri);
-                        var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
-                        var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
-
-                        image.uri = null;
-                        foreach (var b in bytes)
+                        foreach (var image in glTF.images)
                         {
-                            writer.Write(b);
-                        }
-                        glTF.bufferViews.Add(imageView);
-                    }
+                            image.bufferView = glTF.bufferViews.Count;
 
+                            var bytes = File.ReadAllBytes(image.uri);
+                            var byteOffset = glTF.bufferViews[glTF.bufferViews.Count - 1].byteLength + glTF.bufferViews[glTF.bufferViews.Count - 1].byteOffset;
+                            var imageView = glTFUtil.addBufferView(0, byteOffset, bytes.Length);
+
+                            image.uri = null;
+                            foreach (var b in bytes)
+                            {
+                                writer.Write(b);
+                            }
+                            glTF.bufferViews.Add(imageView);
+                        }
+                    }
                 }
 
 

@@ -164,7 +164,7 @@ namespace Revit2Gltf.glTF
                 {
                     parameter.value = p.AsString();
                 }
-                else if (StorageType.Double == p.StorageType)
+                else
                 {
                     parameter.value = p.AsValueString();
                 }
