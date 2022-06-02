@@ -70,9 +70,9 @@ namespace Revit2Gltf.glTF
             //设置y轴向上
             root.matrix = new List<double>()
             {
-                1.0, 0.0,0.0, 0.0,
-                0.0,0.0, -1.0, 0.0,
-                0.0,1.0,0.0,0.0,
+                0.3048, 0.0,0.0, 0.0,
+                0.0,0.0, -0.3048, 0.0,
+                0.0,0.3048,0.0,0.0,
                 0.0,0.0,0.0, 1.0
             };
             glTF.nodes.Add(root);
@@ -208,6 +208,38 @@ namespace Revit2Gltf.glTF
             newbuffer.byteLength = glTF.bufferViews[glTF.bufferViews.Count() - 1].byteOffset +
                          glTF.bufferViews[glTF.bufferViews.Count() - 1].byteLength;
             glTF.buffers = new List<glTFBuffer>() { newbuffer };
+
+            glTF.cameras = new List<glTFCameras>();
+
+
+            //新增相机
+            var view3d = doc.ActiveView as View3D;
+            ViewOrientation3D orientation = view3d.GetOrientation();
+            var camera = new glTFCameras();
+            camera.type = CameraType.perspective;
+            camera.perspective = new glTFPerspectiveCamera();
+            camera.perspective.aspectRatio = 1.0;
+            camera.perspective.yfov = 0.7;
+            camera.perspective.zfar = 100;
+            camera.perspective.znear = 0.01;
+            var cameraNode = new glTFNode();
+            glTF.nodes.Add(cameraNode);
+            cameraNode.camera = 0;
+            ////相机位置
+            cameraNode.translation = new List<double>() {
+                orientation.EyePosition.X,
+                orientation.EyePosition.Y,
+                orientation.EyePosition.Z };
+            //相机方向
+            var n = orientation.ForwardDirection.CrossProduct(orientation.UpDirection);
+            cameraNode.rotation = glTFUtil.MakeQuaternion(n, orientation.UpDirection);
+            cameraNode.name = "revit_camera";
+            glTF.cameras.Add(camera);
+            glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
+
+
+
+
             var fileExtension = Path.GetExtension(setting.fileName).ToLower();
             if (fileExtension == ".gltf")
             {
@@ -217,7 +249,9 @@ namespace Revit2Gltf.glTF
                     byte[] data = memoryStream.ToArray();
                     f.Write(data, 0, data.Length);
                 }
-                File.WriteAllText(setting.fileName, glTF.toJson());
+
+                UTF8Encoding uTF8Encoding = new UTF8Encoding(false);
+                File.WriteAllText(setting.fileName, glTF.toJson(), uTF8Encoding);
             }
             else if (fileExtension == ".glb")
             {
@@ -233,11 +267,13 @@ namespace Revit2Gltf.glTF
                     writer.Write(0U);
                     writer.Write(GLB.ChunkFormatJson);
                     using (var streamWriter = new StreamWriter(writer.BaseStream, new UTF8Encoding(false, true), 1024, true))
-                    using (var jsonTextWriter = new JsonTextWriter(streamWriter))
-                    {
-                        JObject json = JObject.Parse(glTF.toJson());
-                        json.WriteTo(jsonTextWriter);
-                    }
+                    //using (var jsonTextWriter = new JsonTextWriter(streamWriter))
+                    //{
+                    //    JObject json = JObject.Parse(glTF.toJson());
+                    //    json.WriteTo(jsonTextWriter);
+                    //}
+
+                    writer.Write(glTF.toJson());
                     glTFUtil.Align(writer.BaseStream, 0x20);
                     var jsonChunkLength = checked((uint)(writer.BaseStream.Length - jsonChunkPosition)) - GLB.ChunkHeaderLength;
                     writer.BaseStream.Seek(jsonChunkPosition, SeekOrigin.Begin);
@@ -261,6 +297,7 @@ namespace Revit2Gltf.glTF
                 }
             }
             memoryStream.Dispose();
+
 
         }
 
@@ -457,6 +494,7 @@ namespace Revit2Gltf.glTF
 
         public void OnLight(LightNode node)
         {
+            var a = node;
         }
 
         public RenderNodeAction OnLinkBegin(LinkNode node)
@@ -515,6 +553,15 @@ namespace Revit2Gltf.glTF
                         currentAsset = node.GetAppearance();
                     }
                     string assetPropertyString = glTFUtil.ReadAssetProperty(currentAsset);
+                    if (assetPropertyString == null)
+                    {
+                        var asset = glTFUtil.FindTextureAsset(currentAsset);
+                        if (asset != null)
+                        {
+                            assetPropertyString = (glTFUtil.FindTextureAsset(currentAsset).FindByName("unifiedbitmap_Bitmap")
+                           as AssetPropertyString).Value;
+                        }
+                    }
                     if (assetPropertyString != null)
                     {
                         string textureFile = assetPropertyString.Split('|')[0];
@@ -702,6 +749,17 @@ namespace Revit2Gltf.glTF
 
 
             return true;
+        }
+
+        public double[] RotateByVector(double old_x, double old_y, double old_z, double vx, double vy, double vz, double theta)
+        {
+            double[] NewPoint = new double[3];
+            double c = Math.Cos(theta);
+            double s = Math.Sin(theta);
+            NewPoint[0] = (vx * vx * (1 - c) + c) * old_x + (vx * vy * (1 - c) - vz * s) * old_y + (vx * vz * (1 - c) + vy * s) * old_z;
+            NewPoint[1] = (vy * vx * (1 - c) + vz * s) * old_x + (vy * vy * (1 - c) + c) * old_y + (vy * vz * (1 - c) - vx * s) * old_z;
+            NewPoint[2] = (vx * vz * (1 - c) - vy * s) * old_x + (vy * vz * (1 - c) + vx * s) * old_y + (vz * vz * (1 - c) + c) * old_z;
+            return NewPoint;
         }
     }
 }

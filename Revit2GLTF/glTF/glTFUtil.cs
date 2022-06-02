@@ -294,7 +294,131 @@ namespace Revit2Gltf.glTF
             return null ;
         }
 
+        public static List<double> MakeQuaternion(XYZ u, XYZ v)
+        {
 
+            var n = u.CrossProduct(v);
+            double s, tr = 1 + u.X + v.Y + n.Z;
+            double X, Y, Z, W;
+            if (tr > 1e-4)
+            {
+                s = 2 * Math.Sqrt(tr);
+                W = s / 4;
+                X = (v.Z - n.Y) / s;
+                Y = (n.X - u.Z) / s;
+                Z = (u.Y - v.X) / s;
+
+            }
+            else
+            {
+                if (u.X > v.Y && u.X > n.Z)
+                {
+                    s = 2 * Math.Sqrt(1 + u.X - v.Y - n.Z);
+                    W = (v.Z - n.Y) / s;
+                    X = s / 4;
+                    Y = (u.Y + v.X) / s;
+                    Z = (n.X + u.Z) / s;
+                }
+                else if (v.Y > n.Z)
+                {
+                    s = 2 * Math.Sqrt(1 - u.X + v.Y - n.Z);
+                    W = (n.X - u.Z) / s;
+                    X = (u.Y + v.X) / s;
+                    Y = s / 4;
+                    Z = (v.Z + n.Y) / s;
+                }
+                else
+                {
+                    s = 2 * Math.Sqrt(1 - u.X - v.Y + n.Z);
+                    W = (u.Y - v.X) / s;
+                    X = (n.X + u.Z) / s;
+                    Y = (v.Z + n.Y) / s;
+                    Z = s / 4;
+                }
+            }
+
+
+            var magnitude = Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
+            var scale = 1 / magnitude;
+            W = W * scale;
+            X = X * scale;
+            Y = Y * scale;
+            Z = Z * scale;
+            return new List<double>() { X, Y, Z, W };
+        }
+
+        /// <summary>
+        /// 自定义方法，用递归找到包含贴图信息：
+        /// </summary>
+        /// <param name="ap"></param>
+        /// <returns></returns>
+        public static Asset FindTextureAsset(AssetProperty ap)
+        {
+            Asset result = null;
+            if (ap.Type == AssetPropertyType.Asset)
+            {
+                if (!IsTextureAsset(ap as Asset))
+                {
+                    for (int i = 0; i < (ap as Asset).Size; i++)
+                    {
+                        if (null != FindTextureAsset((ap as Asset)[i]))
+                        {
+                            result = FindTextureAsset((ap as Asset)[i]);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    result = ap as Asset;
+                }
+                return result;
+            }
+            else
+            {
+                for (int j = 0; j < ap.NumberOfConnectedProperties; j++)
+                {
+                    if (null != FindTextureAsset(ap.GetConnectedProperty(j)))
+                    {
+                        result = FindTextureAsset(ap.GetConnectedProperty(j));
+                    }
+                }
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// 自定义方法，判断Asset是否包含贴图信息：
+        /// </summary>
+        /// <param name="asset"></param>
+        /// <returns></returns>
+        private static bool IsTextureAsset(Asset asset)
+        {
+            AssetProperty assetProprty = GetAssetProprty(asset, "assettype");
+            if (assetProprty != null && (assetProprty as AssetPropertyString).Value == "texture")
+            {
+                return true;
+            }
+            return GetAssetProprty(asset, "unifiedbitmap_Bitmap") != null;
+        }
+
+        /// <summary>
+        /// 自定义方法，根据名字获取对应的AssetProprty：
+        /// </summary>
+        /// <param name="asset"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        private static AssetProperty GetAssetProprty(Asset asset, string propertyName)
+        {
+            for (int i = 0; i < asset.Size; i++)
+            {
+                if (asset[i].Name == propertyName)
+                {
+                    return asset[i];
+                }
+            }
+            return null;
+        }
 
     }
 }

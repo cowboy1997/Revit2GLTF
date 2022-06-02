@@ -11,6 +11,7 @@ namespace Revit2Gltf.glTF
         public List<string> extensionsRequired;
         public glTFVersion asset;
         public List<glTFScene> scenes;
+        public List<glTFCameras> cameras;
         public List<glTFNode> nodes;
         public List<glTFMesh> meshes;
         public List<glTFAccessor> accessors;
@@ -20,7 +21,6 @@ namespace Revit2Gltf.glTF
         public List<glTFImage> images;
         public List<glTFTexture> textures;
         public List<glTFSampler> samplers;
-
         public string toJson()
         {
             string jsonStr = JsonConvert.SerializeObject(this, new JsonSerializerSettings
@@ -70,6 +70,8 @@ namespace Revit2Gltf.glTF
         public string name { get; set; }
 
         public int? mesh { get; set; } = null;
+
+        public int? camera { get; set; } = null;
 
         public List<double> rotation { get; set; }
 
@@ -285,7 +287,38 @@ namespace Revit2Gltf.glTF
     }
 
 
+    public class glTFCameras
+    {
+        public string type { get; set; }
 
+        public glTFPerspectiveCamera perspective { get; set; } = null;
+
+        public glTFOrthographicCamera orthographic { get; set; } = null;
+    }
+
+    public class CameraType
+    {
+        public static string perspective = "perspective";
+        public static string orthographic = "orthographic";
+    }
+
+    public class glTFPerspectiveCamera
+    {
+        public double aspectRatio { get; set; }
+
+        public double yfov { get; set; }
+        public double zfar { get; set; }
+        public double znear { get; set; }
+    }
+
+    public class glTFOrthographicCamera
+    {
+        public double xmag { get; set; }
+
+        public double ymag { get; set; }
+        public double zfar { get; set; }
+        public double znear { get; set; }
+    }
 
     public class glTFBinaryData
     {
