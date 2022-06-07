@@ -45,7 +45,6 @@ namespace Revit2Gltf
                 TaskDialog mainDialog = new TaskDialog("Revit2GLTF");
                 mainDialog.MainContent = "success! time is:" + stopWatch.Elapsed.TotalSeconds + "s" + "\n"+
                      "<a href=\"https://cowboy1997.github.io/Revit2GLTF/threejs/index?\">" + "open your glb model</a>"; ;
-                //mainDialog.FooterText = "<a href=\"https://cowboy1997.github.io/Revit2GLTF/threejs/index?\">"+ "open your glb model</a>";
                 mainDialog.Show();
 
             }

@@ -196,7 +196,7 @@ namespace Revit2Gltf.glTF
 
         public static string FromFileExtension(string fileExtension)
         {
-            switch (fileExtension.ToLower())
+            switch (Path.GetExtension(fileExtension).ToLower())
             {
                 case ".png":
                     return "image/png";
@@ -207,7 +207,6 @@ namespace Revit2Gltf.glTF
                     return "image/vnd-ms.dds";
             }
             return "image/png";
-
         }
 
 

@@ -225,7 +225,7 @@ namespace Revit2Gltf.glTF
             var cameraNode = new glTFNode();
             glTF.nodes.Add(cameraNode);
             cameraNode.camera = 0;
-            ////相机位置
+            //相机位置
             cameraNode.translation = new List<double>() {
                 orientation.EyePosition.X,
                 orientation.EyePosition.Y,
@@ -267,13 +267,11 @@ namespace Revit2Gltf.glTF
                     writer.Write(0U);
                     writer.Write(GLB.ChunkFormatJson);
                     using (var streamWriter = new StreamWriter(writer.BaseStream, new UTF8Encoding(false, true), 1024, true))
-                    //using (var jsonTextWriter = new JsonTextWriter(streamWriter))
-                    //{
-                    //    JObject json = JObject.Parse(glTF.toJson());
-                    //    json.WriteTo(jsonTextWriter);
-                    //}
-
-                    writer.Write(glTF.toJson());
+                    using (var jsonTextWriter = new JsonTextWriter(streamWriter))
+                    {
+                        JObject json = JObject.Parse(glTF.toJson());
+                        json.WriteTo(jsonTextWriter);
+                    }
                     glTFUtil.Align(writer.BaseStream, 0x20);
                     var jsonChunkLength = checked((uint)(writer.BaseStream.Length - jsonChunkPosition)) - GLB.ChunkHeaderLength;
                     writer.BaseStream.Seek(jsonChunkPosition, SeekOrigin.Begin);
@@ -553,15 +551,15 @@ namespace Revit2Gltf.glTF
                         currentAsset = node.GetAppearance();
                     }
                     string assetPropertyString = glTFUtil.ReadAssetProperty(currentAsset);
-                    if (assetPropertyString == null)
-                    {
-                        var asset = glTFUtil.FindTextureAsset(currentAsset);
-                        if (asset != null)
-                        {
-                            assetPropertyString = (glTFUtil.FindTextureAsset(currentAsset).FindByName("unifiedbitmap_Bitmap")
-                           as AssetPropertyString).Value;
-                        }
-                    }
+                    //if (assetPropertyString == null)
+                    //{
+                    //    var asset = glTFUtil.FindTextureAsset(currentAsset);
+                    //    if (asset != null)
+                    //    {
+                    //        assetPropertyString = (asset.FindByName("unifiedbitmap_Bitmap")
+                    //       as AssetPropertyString).Value;
+                    //    }
+                    //}
                     if (assetPropertyString != null)
                     {
                         string textureFile = assetPropertyString.Split('|')[0];
@@ -586,15 +584,6 @@ namespace Revit2Gltf.glTF
                             image.name = Path.GetFileNameWithoutExtension(texturePath);
                             image.mimeType = glTFUtil.FromFileExtension(texturePath);
                             image.uri = texturePath;
-                            //string textureName = Path.GetFileName(texturePath);
-                            //string dirName = "glTFImage";
-                            //string dir = Path.Combine(gltfOutDir, dirName);
-                            //if (!Directory.Exists(dir))
-                            //{
-                            //    Directory.CreateDirectory(dir);
-                            //}
-                            //File.Copy(texturePath, Path.Combine(dir, textureName), true);
-                            //image.uri = dirName + "/" + textureName;
                             glTF.images.Add(image);
                             if (glTF.samplers.Count == 0)
                             {
@@ -745,21 +734,7 @@ namespace Revit2Gltf.glTF
             {
                 textureFolder = @"C:\Program Files (x86)\Common Files\Autodesk Shared\Materials\Textures\";
             }
-
-
-
             return true;
-        }
-
-        public double[] RotateByVector(double old_x, double old_y, double old_z, double vx, double vy, double vz, double theta)
-        {
-            double[] NewPoint = new double[3];
-            double c = Math.Cos(theta);
-            double s = Math.Sin(theta);
-            NewPoint[0] = (vx * vx * (1 - c) + c) * old_x + (vx * vy * (1 - c) - vz * s) * old_y + (vx * vz * (1 - c) + vy * s) * old_z;
-            NewPoint[1] = (vy * vx * (1 - c) + vz * s) * old_x + (vy * vy * (1 - c) + c) * old_y + (vy * vz * (1 - c) - vx * s) * old_z;
-            NewPoint[2] = (vx * vz * (1 - c) - vy * s) * old_x + (vy * vz * (1 - c) + vx * s) * old_y + (vz * vz * (1 - c) + c) * old_z;
-            return NewPoint;
         }
     }
 }
