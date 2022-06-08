@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 using Microsoft.Win32;
 using Revit2Gltf.glTF;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using Document = Autodesk.Revit.DB.Document;
@@ -38,7 +39,7 @@ namespace Revit2Gltf
                 CustomExporter exporter = new CustomExporter(doc, context);
                 exporter.IncludeGeometricObjects = false;
                 exporter.ShouldStopOnError = true;
-                exporter.Export(doc.ActiveView as View3D);
+                exporter.Export(new List<ElementId>() { doc.ActiveView.Id });
                 stopWatch.Stop();
 
 
