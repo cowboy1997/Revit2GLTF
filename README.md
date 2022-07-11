@@ -2,7 +2,7 @@
 
 #### 介绍
 
-这是一个基于MIT开源协议的revit导出gltf的开源库，支持revit2018~revit2022，项目依赖于revit，通用构件的合并以及C#对draco算法库的封装，拥有极快的导出速度和极高的压缩率
+这是一个基于MIT开源协议的revit导出gltf的开源库，支持revit2020~revit2023，项目依赖于revit，通用构件的合并以及C#对draco算法库的封装，拥有极快的导出速度和极高的压缩率
 
 ![image](https://github.com/cowboy1997/Revit2GLTF/blob/main/test.png)
 
