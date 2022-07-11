@@ -240,10 +240,10 @@ namespace Revit2Gltf.glTF
 #if Revit2016 || Revit2017
                case AssetPropertyType.APT_Integer:
 #else
-                        case AssetPropertyType.Integer:
+               case AssetPropertyType.Integer:
 #endif
                             AssetPropertyString val2 = prop as AssetPropertyString;
-                            if (val2.Name == "unifiedbitmap_Bitmap")
+                            if (val2!=null &&val2.Name == "unifiedbitmap_Bitmap")
                             {
                                 return val2.Value;
                             }
