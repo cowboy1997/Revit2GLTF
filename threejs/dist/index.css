@@ -1,0 +1,238 @@
+/* 公共样式表css */
+html, body {
+    color: #333;
+    margin: 0;
+    height: 100%;
+    font-family: "Myriad Set Pro", "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: normal;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+img {
+    border: 0;
+}
+
+body {
+    background-color: #191919;
+    color: #666;
+}
+
+html, body, div, dl, dt, dd, ol, ul, li, h1, h2, h3, h4, h5, h6, p, blockquote, pre, button, fieldset, form, input, legend, textarea, th, td {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #08acee;
+}
+
+button {
+    outline: 0;
+}
+
+img {
+    border: 0;
+}
+
+button, input, optgroup, select, textarea {
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    outline: none;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    color: #666;
+}
+
+a:hover {
+    color: #eee;
+}
+
+.clearfix::after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
+.clearfix {
+}
+
+/* 必要布局样式css */
+.case-content-bg {
+    padding-bottom: 0;
+    height: 665px;
+    background: url("../img/bg.png") no-repeat;
+    background-size: cover;
+    background-position: center 50%;
+    -webkit-transition: all 1s;
+    -moz-transition: all 1s;
+    -ms-transition: all 1s;
+    -o-transition: all 1s;
+    transition: all 1s;
+}
+
+.case-content-info {
+    background-position: center 10%;
+    padding: 80px 0;
+}
+
+.case-box {
+    width: 83%;
+    margin: 0 auto;
+    position: relative;
+}
+
+.case-box-title {
+    text-align: center;
+    color: #fff;
+    font-weight: normal;
+    padding-bottom: 40px;
+}
+
+.case-box-title em {
+    display: block;
+    margin-bottom: 14px;
+    font-style: normal;
+    font-size: 30px;
+    font-weight: normal;
+}
+
+.case-box-title span {
+    font-size: 16px;
+    opacity: .6;
+    color: #fff;
+    text-align: center;
+}
+
+.case-item {
+    cursor: pointer;
+    width: 380px;
+    height: 280px;
+    float: left;
+    display: block;
+    margin: 20px 0 0 0;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    background-image: -webkit-linear-gradient(bottom, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
+    background-image: -moz-linear-gradient(bottom, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
+    background-image: -moz-linear-gradient(to top, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
+    background-image: -o-linear-gradient(to top, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
+    background-image: linear-gradient(to top, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
+    background-repeat: repeat;
+    margin-left: 15px;
+    margin-top: 20px;
+}
+
+.case-wrapper .case-item:hover {
+    background-color: #2F4C90;
+    box-shadow: 0 0 10px #999;
+}
+
+.case-item-bg1 {
+    margin: auto;
+    background: url(../img/1662696064542.jpg) no-repeat center;
+    background-size: contain;
+}
+
+.case-item-bg2 {
+    margin: auto;
+    background: url(../img/1662702722569.jpg) no-repeat center;
+    background-size: contain;
+}
+
+.case-item-bg3 {
+    margin: auto;
+    background: url(../img/1663042206221.jpg) no-repeat center;
+    background-size: contain;
+}
+
+.case-item-bg4 {
+    margin: auto;
+    background: url(../img/4.png) no-repeat center;
+    background-size: contain;
+}
+
+.case-item-bg {
+    height: 300px;
+    margin-top: -50px;
+}
+
+.case-item-title {
+    font-size: 18px;
+    color: #fff;
+    text-align: center;
+    margin: -20px 0;
+}
+
+.case-item-text {
+    font-size: 14px;
+    color: #999999;
+    line-height: 24px;
+    height: calc(100% - 338px);
+    margin: 0 30px;
+    overflow: hidden;
+}
+
+.case-item-doc {
+    padding: 20px 30px;
+    width: 280px;
+    bottom: 0;
+    position: absolute;
+    background: #27272e;
+}
+
+.case-item-doc p {
+    line-height: 30px;
+    margin: 0;
+    font-size: 14px;
+    color: #999999;
+}
+
+.case-item-doc p a {
+    font-size: 14px;
+    color: #fff;
+    float: left;
+    width: calc(50% - 1px);
+}
+
+.case-item-doc a+a::before {
+    content: '|';
+    float: left;
+    color: rgba(102,102,102,0.6)
+}
+
+/* .case-wrapper .case-item+.case-item {
+    margin-left: 20px;
+} */
+
+.case-wrapper .case-item .case-item-doc a+a {
+    text-align: right;
+}
+
+.case-wrapper .case-item a:hover {
+    text-decoration: underline;
+}
