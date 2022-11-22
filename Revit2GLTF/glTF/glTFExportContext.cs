@@ -673,6 +673,12 @@ namespace Revit2Gltf.glTF
                 currentGeometry.indexBuffer.Add(index2);
                 currentGeometry.indexBuffer.Add(index3);
 
+
+                if (!currentGeometry.indexMax.HasValue)
+                {
+                    currentGeometry.indexMax = 0;
+                }
+
                 if (index1 > currentGeometry.indexMax)
                 {
                     currentGeometry.indexMax = index1;
