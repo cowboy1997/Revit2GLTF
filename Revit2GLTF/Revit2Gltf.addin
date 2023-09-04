@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>Revit2Gltf</Name>
+        <Assembly>Revit2Gltf/Revit2Gltf.dll</Assembly>
+        <FullClassName>Revit2Gltf.App</FullClassName>
+        <AddInId>ED2327C7-7A24-2BB4-1EE2-1EEF5A367576</AddInId>
+        <VendorId>ADSK</VendorId>
+        <VendorDescription>cowboy, https://github.com/cowboy1997/Revit2GLTF/</VendorDescription>
+    </AddIn>
+</RevitAddIns>
