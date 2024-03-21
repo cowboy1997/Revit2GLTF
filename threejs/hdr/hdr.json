@@ -1,0 +1,26 @@
+[
+  {
+    "id": 0,
+    "name": "默认",
+    "previewUrl": "./no.png",
+    "hdrUrl": ""
+  },
+  {
+    "id": 1,
+    "name": "草地",
+    "previewUrl": "hdr/resting_place/resting_place.webp",
+    "hdrUrl": "hdr/resting_place/resting_place_1k.hdr"
+  },
+  {
+    "id": 2,
+    "name": "户外",
+    "previewUrl": "hdr/rural_asphalt_road/rural_asphalt_road.webp",
+    "hdrUrl": "hdr/rural_asphalt_road/rural_asphalt_road_1k.hdr"
+  },
+  {
+    "id": 3,
+    "name": "城市",
+    "previewUrl": "hdr/quattro_canti/quattro_canti.webp",
+    "hdrUrl": "hdr/quattro_canti/quattro_canti_1k.hdr"
+  }
+]

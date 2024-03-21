@@ -81,7 +81,7 @@ a:hover {
 .case-content-bg {
     padding-bottom: 0;
     height: 665px;
-    background: url("./img/bg.png") no-repeat;
+    background: url("../img/bg.png") no-repeat;
     background-size: cover;
     background-position: center 50%;
     -webkit-transition: all 1s;
@@ -154,25 +154,25 @@ a:hover {
 
 .case-item-bg1 {
     margin: auto;
-    background: url(./img/1662696064542.jpg) no-repeat center;
+    background: url(../img/1662696064542.jpg) no-repeat center;
     background-size: contain;
 }
 
 .case-item-bg2 {
     margin: auto;
-    background: url(./img/1662702722569.jpg) no-repeat center;
+    background: url(../img/1662702722569.jpg) no-repeat center;
     background-size: contain;
 }
 
 .case-item-bg3 {
     margin: auto;
-    background: url(./img/1663042206221.jpg) no-repeat center;
+    background: url(../img/1663042206221.jpg) no-repeat center;
     background-size: contain;
 }
 
 .case-item-bg4 {
     margin: auto;
-    background: url(./img/4.png) no-repeat center;
+    background: url(../img/4.png) no-repeat center;
     background-size: contain;
 }
 
