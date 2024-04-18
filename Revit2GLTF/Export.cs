@@ -1,51 +1,55 @@
-﻿
-
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Microsoft.Win32;
 using Revit2Gltf.glTF;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows;
-using Document = Autodesk.Revit.DB.Document;
-
 
 namespace Revit2Gltf
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-    public class Export : Autodesk.Revit.UI.IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class Export : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            UIDocument uidoc = commandData.Application.ActiveUIDocument;
-            Document doc = uidoc.Document;
-
-
-            MainWindow mainWindow = new MainWindow();
-
-            if(mainWindow.ShowDialog()==true)
+            var doc = commandData.Application.ActiveUIDocument.Document;
+            if (!(doc.ActiveView is View3D))
             {
-                Stopwatch stopWatch = new Stopwatch();
+                TaskDialog.Show("提示", "当前视图不支持导出，请切换至3D视图");
+                return Result.Cancelled;
+            }
+
+
+            var mainWindow = new MainWindow();
+            if (mainWindow.ShowDialog() == true)
+            {
+                var stopWatch = new Stopwatch();
                 //测量运行时间
                 stopWatch.Start();
-                glTFSetting setting = new glTFSetting();
-                setting.useDraco = (bool)mainWindow.useDraco.IsChecked;
-                setting.fileName = mainWindow.fileName.Text;
-                setting.exportProperty = (bool)mainWindow.exportProperty.IsChecked;
-                glTFExportContext context = new glTFExportContext(doc, setting);
-                CustomExporter exporter = new CustomExporter(doc, context);
-                exporter.IncludeGeometricObjects = false;
-                exporter.ShouldStopOnError = true;
+                var setting = new glTFSetting
+                {
+                    useDraco = (bool)mainWindow.useDraco.IsChecked,
+                    fileName = mainWindow.fileName.Text,
+                    exportProperty = (bool)mainWindow.exportProperty.IsChecked
+                };
+                var context = new glTFExportContext(doc, setting);
+                var exporter = new CustomExporter(doc, context)
+                {
+                    IncludeGeometricObjects = false,
+                    ShouldStopOnError = true
+                };
                 exporter.Export(new List<ElementId>() { doc.ActiveView.Id });
                 stopWatch.Stop();
 
 
-                TaskDialog mainDialog = new TaskDialog("Revit2GLTF");
-                mainDialog.MainContent = "success! time is:" + stopWatch.Elapsed.TotalSeconds + "s" + "\n"+
-                     "<a href=\"https://cowboy1997.github.io/Revit2GLTF/threejs/index?\">" + "open your glb model</a>"; ;
+                var mainDialog = new TaskDialog("Revit2GLTF")
+                {
+                    MainContent = "success! time is:" + stopWatch.Elapsed.TotalSeconds + "s" + "\n" +
+                     "<a href=\"https://cowboy1997.github.io/Revit2GLTF/threejs/index?\">" + "open your glb model</a>"
+                };
+                ;
                 mainDialog.Show();
 
             }
@@ -53,3 +57,4 @@ namespace Revit2Gltf
         }
     }
 }
+
