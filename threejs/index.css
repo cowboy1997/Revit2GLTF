@@ -81,7 +81,7 @@ a:hover {
 .case-content-bg {
     padding-bottom: 0;
     height: 665px;
-    background: url("../img/bg.png") no-repeat;
+    background: url("./img/bg.png") no-repeat;
     background-size: cover;
     background-position: center 50%;
     -webkit-transition: all 1s;
