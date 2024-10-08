@@ -94,6 +94,7 @@ a:hover {
 .case-content-info {
     background-position: center 10%;
     padding: 80px 0;
+    height: 100%;
 }
 
 .case-box {
