@@ -125,12 +125,13 @@ a:hover {
 }
 
 .case-item {
+    flex: 1; 
     cursor: pointer;
     width: 380px;
-    height: 280px;
+    height: auto;
     float: left;
     display: block;
-    margin: 20px 0 0 0;
+    margin: 50px 0 0 0;
     position: relative;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
@@ -143,49 +144,36 @@ a:hover {
     background-image: -o-linear-gradient(to top, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
     background-image: linear-gradient(to top, rgba(72, 72, 79, 0.3) 0%, #00316d 100%);
     background-repeat: repeat;
-    margin-left: 15px;
+    margin-left: 50px;
     margin-top: 20px;
 }
-
+.case-wrapper {
+    display: flex;
+}
 .case-wrapper .case-item:hover {
     background-color: #2F4C90;
     box-shadow: 0 0 10px #999;
 }
 
-.case-item-bg1 {
-    margin: auto;
-    background: url(../img/1662696064542.jpg) no-repeat center;
-    background-size: contain;
+
+.case-item-imageDiv {
+    height: calc(100% - 50px);
+    width: 100%;
+    text-align: center;
 }
 
-.case-item-bg2 {
-    margin: auto;
-    background: url(../img/1662702722569.jpg) no-repeat center;
-    background-size: contain;
-}
-
-.case-item-bg3 {
-    margin: auto;
-    background: url(../img/1663042206221.jpg) no-repeat center;
-    background-size: contain;
-}
-
-.case-item-bg4 {
-    margin: auto;
-    background: url(../img/4.png) no-repeat center;
-    background-size: contain;
-}
-
-.case-item-bg {
-    height: 300px;
-    margin-top: -50px;
+.case-item-image {
+    height:100%;
+    width: 100%;
+    object-fit: cover;
 }
 
 .case-item-title {
     font-size: 18px;
     color: #fff;
     text-align: center;
-    margin: -20px 0;
+    height: 50px;
+    margin: 10px 0
 }
 
 .case-item-text {
