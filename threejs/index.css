@@ -125,8 +125,18 @@ a:hover {
     text-align: center;
 }
 
+.case-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; 
+    justify-content: center;
+    
+}
+
 .case-item {
-    flex: 1; 
+    /* flex: 1;  */
+    flex: 0 0 380px; /* 子元素的基础宽度为 200px，允许伸缩 */
+    text-align: center;
     cursor: pointer;
     width: 380px;
     height: auto;
@@ -148,9 +158,7 @@ a:hover {
     margin-left: 50px;
     margin-top: 20px;
 }
-.case-wrapper {
-    display: flex;
-}
+
 .case-wrapper .case-item:hover {
     background-color: #2F4C90;
     box-shadow: 0 0 10px #999;
